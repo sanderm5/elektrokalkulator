@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable: safe zone er 40% midten (ca. 102.4px padding fra hver kant). -->
+  <rect width="512" height="512" fill="#0A0B0F"/>
+  <path d="M280 156 L186 320 H252 L220 422 L340 234 H272 Z"
+        fill="#C97B43" stroke="#FBEFE4" stroke-width="4" stroke-linejoin="round"/>
+</svg>

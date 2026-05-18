@@ -1,0 +1,362 @@
+@import url('/katex/katex.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme='dark'] {
+  /* Fonter */
+  --font-sans: 'Söhne', 'Geist Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, 'Menlo', monospace;
+  --font-display: 'Söhne Breit', 'Inter Display', 'SF Pro Display', system-ui, sans-serif;
+
+  /* Dark theme — verdier (rgb-tripletter for Tailwind) */
+  --ink-950: 10 11 15;       /* dypeste bakgrunn */
+  --ink-900: 14 16 21;
+  --ink-800: 21 24 31;
+  --ink-700: 30 34 43;
+  --ink-600: 42 47 58;
+  --ink-500: 109 113 124;    /* dempet tekst — fungerer i begge temaer */
+  --ink-200: 200 202 210;
+  --ink-50: 232 233 238;     /* primær tekst */
+
+  --copper-50: 251 239 228;
+  --copper-100: 244 217 190;
+  --copper-200: 232 179 131;
+  --copper-300: 218 149 88;
+  --copper-400: 201 123 67;
+  --copper-500: 179 103 58;
+  --copper-600: 149 83 48;
+  --copper-700: 119 65 39;
+
+  --live-400: 183 212 91;
+  --live-500: 148 179 57;
+
+  /* Danger — kritiske avvik. Dempet rød/burgunder, matcher dark-paletten. */
+  --danger-300: 240 158 142;
+  --danger-400: 224 119 102;
+  --danger-500: 196 84 70;
+
+  /* Body-gradient bakgrunnsfarge */
+  --body-bg: #0A0B0F;
+  --body-glow-1: rgba(201, 123, 67, 0.08);
+  --body-glow-2: rgba(183, 212, 91, 0.04);
+
+  /* Glass-effekt */
+  --glass-bg-top: rgba(30, 34, 43, 0.6);
+  --glass-bg-bottom: rgba(21, 24, 31, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-inset: rgba(255, 255, 255, 0.05);
+
+  --shadow-soft: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+                 0 8px 24px -8px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+                 0 24px 48px -16px rgba(0, 0, 0, 0.5),
+                 0 0 0 1px rgba(255, 255, 255, 0.04);
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  /* Light theme — ink-skala BYTTET om så samme klasser fortsetter å virke */
+  --ink-950: 250 250 247;    /* lys bakgrunn (var mørk) */
+  --ink-900: 244 244 240;
+  --ink-800: 233 232 226;
+  --ink-700: 218 216 208;
+  --ink-600: 172 170 162;
+  --ink-500: 109 113 124;    /* uendret — dempet i begge */
+  --ink-200: 53 58 67;
+  --ink-50: 14 16 21;        /* mørk tekst (var lys) */
+
+  /* Litt mørkere kobber for kontrast på lys bakgrunn */
+  --copper-50: 119 65 39;    /* "bleekste" blir mørk-kobber i light */
+  --copper-100: 149 83 48;
+  --copper-200: 165 95 50;
+  --copper-300: 165 95 50;
+  --copper-400: 165 95 50;   /* hovedaksent — mørkere kobber */
+  --copper-500: 149 83 48;
+  --copper-600: 119 65 39;
+  --copper-700: 95 52 31;
+
+  /* Mørkere grønn for kontrast */
+  --live-400: 95 122 39;
+  --live-500: 75 100 30;
+
+  /* Mørkere danger for kontrast på lys bakgrunn */
+  --danger-300: 168 50 38;
+  --danger-400: 150 40 32;
+  --danger-500: 128 32 26;
+
+  /* Lys bg-gradient */
+  --body-bg: #FAFAF7;
+  --body-glow-1: rgba(165, 95, 50, 0.06);
+  --body-glow-2: rgba(75, 100, 30, 0.04);
+
+  --glass-bg-top: rgba(255, 255, 255, 0.7);
+  --glass-bg-bottom: rgba(248, 247, 244, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-inset: rgba(255, 255, 255, 0.6);
+
+  --shadow-soft: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+                 0 8px 24px -8px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+                 0 24px 48px -16px rgba(0, 0, 0, 0.10),
+                 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+  color-scheme: light;
+}
+
+html {
+  background: var(--body-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -20%, var(--body-glow-1), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, var(--body-glow-2), transparent 60%),
+    var(--body-bg);
+  background-attachment: fixed;
+  color: rgb(var(--ink-50));
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  min-height: 100vh;
+  transition: background-color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* KaTeX overrides — formler skal være store og lesbare */
+.katex {
+  font-size: 1.15em;
+  color: rgb(var(--copper-200));
+}
+
+.katex-display {
+  margin: 0.5em 0;
+  padding: 0.5em 0;
+}
+
+.katex-display > .katex {
+  font-size: 1.4em;
+}
+
+/* Glassmorphism kort */
+.glass {
+  background: linear-gradient(180deg,
+    var(--glass-bg-top) 0%,
+    var(--glass-bg-bottom) 100%);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
+}
+
+.glass-hover {
+  transition: border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.glass-hover:hover {
+  border-color: rgb(var(--copper-400) / 0.4);
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 0 var(--glass-inset) inset,
+    0 32px 64px -16px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgb(var(--copper-400) / 0.25),
+    0 0 24px -4px rgb(var(--copper-400) / 0.2);
+}
+
+/* Inputfelter — eksamen-modus, store og tydelige */
+.calc-input {
+  background: rgb(var(--ink-950) / 0.7);
+  border: 1px solid var(--glass-border);
+  color: rgb(var(--ink-50));
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+              background 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.calc-input:focus {
+  outline: none;
+  border-color: rgb(var(--copper-400) / 0.6);
+  background: rgb(var(--ink-900) / 0.9);
+  box-shadow: 0 0 0 4px rgb(var(--copper-400) / 0.12);
+}
+
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.calc-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* Search-modal: variabel-basert bakgrunn + glow så den følger temaet */
+.search-modal {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--ink-900) / 0.92) 0%,
+    rgb(var(--ink-800) / 0.96) 100%
+  );
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow:
+    0 32px 64px -16px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--glass-inset),
+    0 0 80px -20px rgb(var(--copper-400) / 0.35);
+}
+
+[data-theme='light'] .search-modal {
+  background: linear-gradient(
+    180deg,
+    rgb(var(--ink-950) / 0.98) 0%,
+    rgb(var(--ink-900) / 0.99) 100%
+  );
+  box-shadow:
+    0 24px 64px -16px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 0 80px -20px rgb(var(--copper-400) / 0.25);
+}
+
+/* Resultat — store tall, animasjon når de oppdateres */
+.result-value {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum', 'ss01';
+}
+
+/* Smooth fokus-ringer for keyboard-nav */
+:focus-visible {
+  outline: 2px solid rgb(var(--copper-400) / 0.7);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Selection */
+::selection {
+  background: rgb(var(--copper-400) / 0.35);
+  color: rgb(var(--ink-50));
+}
+
+/* Fysikk-toggle: skjul sjeldne formler når toggle er av */
+body:not([data-show-fysikk="true"]) [data-relevans="sjelden"] {
+  display: none;
+}
+
+/* Når sjeldne er synlige (toggle på), gi dem en subtil markør */
+body[data-show-fysikk="true"] [data-relevans="sjelden"] {
+  position: relative;
+}
+
+/* Dynamisk teller: vis "off"-span når toggle av, "on"-span når på */
+[data-fysikk-mode="on"] {
+  display: none;
+}
+body[data-show-fysikk="true"] [data-fysikk-mode="off"] {
+  display: none;
+}
+body[data-show-fysikk="true"] [data-fysikk-mode="on"] {
+  display: inline;
+}
+
+/* Skjul kategori-kort som er helt tomme uten fysikk */
+body:not([data-show-fysikk="true"]) [data-tomt-uten-fysikk="true"] {
+  display: none;
+}
+
+/* Print-CSS: skjul interaktive elementer, optimaliser for A4 */
+@media print {
+  html, body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+  body::before, body::after {
+    display: none !important;
+  }
+  /* Skjul navigasjon/topbar/footer */
+  header, footer, nav, [role="dialog"], .calc-input, [aria-label="Lukk søk"], button {
+    display: none !important;
+  }
+  /* Tabell-filter input skjules */
+  input[type="search"] {
+    display: none !important;
+  }
+  /* Skjul "Relaterte formler", "Brukes med disse formlene" */
+  [aria-labelledby="relatert-tittel"], [aria-labelledby="eksempler-tittel"] ~ section {
+    page-break-inside: avoid;
+  }
+  /* Glass-effekter erstattes med synlig border */
+  .glass {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: black !important;
+  }
+  /* Formel-tekst i sort */
+  .katex, .katex * {
+    color: black !important;
+  }
+  /* Linker uten farge/understrek */
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+  /* Ikke side-break midt i en formel-blokk */
+  article, section {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3 {
+    color: black !important;
+    page-break-after: avoid;
+  }
+  /* Vis URL etter eksterne lenker */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+  /* Vise resultat-feltet med ramme */
+  [role="status"] {
+    border: 2px solid #333 !important;
+    padding: 8pt !important;
+  }
+  /* Result value i fet sort */
+  .result-value {
+    color: black !important;
+    font-weight: bold;
+  }
+  /* Subtle gridded background av */
+  body {
+    background-image: none !important;
+  }
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--ink-700) / 0.6);
+  border-radius: 10px;
+  border: 2px solid rgb(var(--ink-950));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--copper-400) / 0.4);
+}
