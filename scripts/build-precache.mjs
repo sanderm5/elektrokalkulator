@@ -41,6 +41,9 @@ function shouldInclude(urlPath) {
   if (urlPath === '/sw.js') return false;
   // Source maps er ikke nødvendige offline.
   if (urlPath.endsWith('.map')) return false;
+  // Next.js 404-sider serveres av Vercel med 404-status, så cache.add() avviser
+  // dem. Navigation-handler i sw.js faller uansett tilbake til "/" ved offline-miss.
+  if (urlPath === '/404.html' || urlPath === '/404/') return false;
   return true;
 }
 
