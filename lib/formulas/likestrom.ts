@@ -412,8 +412,115 @@ export const LIKESTROM_FORMULAS: Formula[] = [
         answer: 'R = 0,35 Ω',
       },
     ],
-    related: ['temperatur-motstand', 'effekt-i2r'],
-    keywords: ['resistivitet', 'rho', 'kobber', 'aluminium', 'leder'],
+    related: ['tverrsnitt-fra-motstand', 'lengde-fra-motstand', 'temperatur-motstand', 'effekt-i2r'],
+    keywords: ['resistivitet', 'rho', 'kobber', 'aluminium', 'leder', 'kabellengde'],
+  },
+
+  {
+    id: 'tverrsnitt-fra-motstand',
+    category: 'likestrom',
+    title: 'Tverrsnitt fra ønsket motstand',
+    subtitle: 'A = ρ · l / R',
+    latex: 'A = \\dfrac{\\rho \\cdot l}{R}',
+    description:
+      'Omvendt form av R = ρ·l/A. Når du har gitt lengde og maksimalt tillatt motstand, finner du nødvendig tverrsnitt. Rundes opp til nærmeste standard-tverrsnitt (1,5 — 2,5 — 4 — 6 — 10 — 16 — 25 mm²).',
+    whenToUse:
+      'For å dimensjonere kabel når du har en motstandsgrense — typisk fra et spenningsfallkrav eller termisk grense. Også når du sammenligner Cu vs. Al for samme R-grense.',
+    inputs: [
+      { symbol: 'rho', name: 'Resistivitet (ρ)', unit: 'Ω·mm²/m', defaultValue: 0.0175, hint: 'Kobber: 0,0175. Aluminium: 0,028.', min: 0 },
+      { symbol: 'l', name: 'Lederlengde', unit: 'm', defaultValue: 100, hint: 'Lengde én vei fra kilde til last.', min: 0 },
+      { symbol: 'R', name: 'Maks tillatt motstand', unit: 'Ω', defaultValue: 0.5, hint: 'Grenseverdi for hele lederen.', min: 0 },
+    ],
+    output: { symbol: 'A', name: 'Nødvendig tverrsnitt', unit: 'mm²', decimals: 3 },
+    calculate: ({ rho, l, R }) => {
+      if (R <= 0) throw new Error('Motstand må være større enn 0 Ω.');
+      return (rho * l) / R;
+    },
+    interpret: (result) => {
+      const standard = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
+      const next = standard.find((s) => s >= result);
+      if (!next) {
+        return {
+          status: 'warning',
+          message: `Beregnet tverrsnitt ${result.toFixed(2)} mm² er over største standard (240 mm²). Vurder parallelle ledere eller annet materiale.`,
+        };
+      }
+      return {
+        status: 'ok',
+        message: `Bruk neste standardtverrsnitt: ${next} mm² (beregnet ${result.toFixed(2)} mm²).`,
+      };
+    },
+    examples: [
+      {
+        scenario:
+          'En kobberleder skal være maks 100 m lang og ha maks 0,5 Ω motstand. Hvilket tverrsnitt trengs?',
+        inputs: { rho: 0.0175, l: 100, R: 0.5 },
+        steps: [
+          { latex: 'A = \\dfrac{\\rho \\cdot l}{R}' },
+          { latex: 'A = \\dfrac{0{,}0175 \\cdot 100}{0{,}5} = \\dfrac{1{,}75}{0{,}5}' },
+          { latex: 'A = 3{,}5\\ \\mathrm{mm^{2}} \\rightarrow \\text{velg 4 mm}^{2}' },
+        ],
+        answer: 'A ≈ 3,5 mm² → bruk 4 mm² (nærmeste standard).',
+      },
+      {
+        scenario:
+          'Aluminium-tilførsel 80 m, maks 0,3 Ω. Hvilket tverrsnitt trengs?',
+        inputs: { rho: 0.028, l: 80, R: 0.3 },
+        steps: [
+          { latex: 'A = \\dfrac{0{,}028 \\cdot 80}{0{,}3}' },
+          { latex: 'A \\approx 7{,}47\\ \\mathrm{mm^{2}} \\rightarrow \\text{velg 10 mm}^{2}' },
+        ],
+        answer: 'A ≈ 7,47 mm² → bruk 10 mm² Al.',
+      },
+    ],
+    related: ['resistivitet', 'lengde-fra-motstand', 'spenningsfall-enfase-forenklet'],
+    keywords: ['tverrsnitt', 'dimensjonering', 'kobber', 'aluminium', 'mm²'],
+  },
+  {
+    id: 'lengde-fra-motstand',
+    category: 'likestrom',
+    title: 'Maks lederlengde fra motstandsgrense',
+    subtitle: 'l = R · A / ρ',
+    latex: 'l = \\dfrac{R \\cdot A}{\\rho}',
+    description:
+      'Hvor langt du kan legge en kabel før motstanden overstiger en gitt grense. Nyttig for å sjekke om en installasjon kan strekke seg dit du planlegger, eller om du må øke tverrsnittet.',
+    whenToUse:
+      'Når tverrsnittet er gitt og du må vite hvor langt kabelen kan være. Typisk for å sammenligne mot fysisk avstand i en bygning.',
+    inputs: [
+      { symbol: 'R', name: 'Maks tillatt motstand', unit: 'Ω', defaultValue: 0.5, hint: 'Grenseverdi for hele lederen.', min: 0 },
+      { symbol: 'A', name: 'Tverrsnitt', unit: 'mm²', defaultValue: 2.5, hint: 'Vanlige verdier: 1,5 — 2,5 — 4 — 6 — 10 — 16 mm².', min: 0 },
+      { symbol: 'rho', name: 'Resistivitet (ρ)', unit: 'Ω·mm²/m', defaultValue: 0.0175, hint: 'Kobber: 0,0175. Aluminium: 0,028.', min: 0 },
+    ],
+    output: { symbol: 'l', name: 'Maks lederlengde', unit: 'm', decimals: 2 },
+    calculate: ({ R, A, rho }) => {
+      if (rho <= 0) throw new Error('Resistivitet må være > 0.');
+      return (R * A) / rho;
+    },
+    examples: [
+      {
+        scenario:
+          'Du har 2,5 mm² kobberkabel og kan ikke overskride 0,5 Ω motstand. Hvor lang kan kabelen være?',
+        inputs: { R: 0.5, A: 2.5, rho: 0.0175 },
+        steps: [
+          { latex: 'l = \\dfrac{R \\cdot A}{\\rho}' },
+          { latex: 'l = \\dfrac{0{,}5 \\cdot 2{,}5}{0{,}0175} = \\dfrac{1{,}25}{0{,}0175}' },
+          { latex: 'l \\approx 71{,}4\\ \\mathrm{m}' },
+        ],
+        answer: 'l ≈ 71,4 m maks.',
+      },
+      {
+        scenario:
+          'Samme krav (0,5 Ω) med 4 mm² aluminium. Hvor lang?',
+        inputs: { R: 0.5, A: 4, rho: 0.028 },
+        steps: [
+          { latex: 'l = \\dfrac{0{,}5 \\cdot 4}{0{,}028}' },
+          { latex: 'l \\approx 71{,}4\\ \\mathrm{m}' },
+        ],
+        answer: 'l ≈ 71,4 m — sammenlignbart fordi Al-tverrsnittet er større.',
+      },
+    ],
+    related: ['resistivitet', 'tverrsnitt-fra-motstand', 'spenningsfall-enfase-forenklet'],
+    keywords: ['lengde', 'kabellengde', 'maks lengde', 'leder'],
   },
 
   // --- TEMPERATUR ------------------------------------------------------
