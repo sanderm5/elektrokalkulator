@@ -1,7 +1,7 @@
 // Service Worker — Elektro-kalkulator
 // Precache-listen injiseres av scripts/build-precache.mjs etter `next build`.
 // Bump VERSION når du vil tvinge ny installasjon hos eksisterende klienter.
-const VERSION = 'elektro-v4';
+const VERSION = 'elektro-v5';
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const STATIC_CACHE = `${VERSION}-static`;
 

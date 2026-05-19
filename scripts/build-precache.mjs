@@ -30,10 +30,15 @@ async function walk(dir) {
 
 function toUrlPath(absPath) {
   const rel = relative(OUT_DIR, absPath).split(sep).join('/');
+  let path;
   // index.html → katalog med trailing slash (matcher trailingSlash: true)
-  if (rel === 'index.html') return '/';
-  if (rel.endsWith('/index.html')) return '/' + rel.slice(0, -'index.html'.length);
-  return '/' + rel;
+  if (rel === 'index.html') path = '/';
+  else if (rel.endsWith('/index.html')) path = '/' + rel.slice(0, -'index.html'.length);
+  else path = '/' + rel;
+  // URL-enkod tegn som browser enkoder i requesten (f.eks. [ og ] i Next.js
+  // dynamic-route chunks som /modul/[id]/page-*.js → /modul/%5Bid%5D/page-*.js).
+  // Uten dette matcher ikke cache-keyen browser-requesten og vi får ChunkLoadError.
+  return encodeURI(path);
 }
 
 function shouldInclude(urlPath) {
